@@ -1,5 +1,131 @@
-<div class="grid h-screen place-items-center">
-  <div class="font-bold text-3xl">
-    Fyle Internship Challenge
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6">GitHub Repositories</h1>
+
+  <div class="flex mb-4 gap-3">
+    <input
+      [(ngModel)]="username"
+      type="text"
+      class="flex-grow rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      placeholder="Enter GitHub Username"
+    />
+    <button
+      (click)="searchUser()"
+      class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+    >
+      Search
+    </button>
+  </div>
+
+  <!-- <div *ngIf="isLoading">
+    <!-- <div class="flex flex-col items-center justify-center">
+      <div
+        class="skeleton w-20 h-20 rounded-full bg-gray-200 animate-pulse"
+      ></div>
+      <div>
+        <div
+          class="skeleton w-full h-20 rounded-md bg-gray-200 animate-pulse"
+        ></div>
+        <div
+          class="skeleton w-full h-10 rounded-md bg-gray-200 animate-pulse"
+        ></div>
+      </div>
+    </div>
+    <div
+      class="skeleton w-full h-10 rounded-md bg-gray-200 animate-pulse"
+    ></div>
+    <div
+      class="skeleton w-full h-10 rounded-md bg-gray-200 animate-pulse"
+    ></div>
+    <div
+      class="skeleton w-full h-10 rounded-md bg-gray-200 animate-pulse"
+    ></div> -->
+  <!-- <ngx-skeleton-loader count="1" appearance="circle"></ngx-skeleton-loader>
+  </div> -->
+
+  <!-- <div>
+    <ngx-skeleton-loader
+      *ngIf="isLoading"
+      appearance="circle"
+    ></ngx-skeleton-loader>
+  </div> -->
+
+  <!-- <ngx-skeleton-loader
+    count="5"
+    [theme]="{
+      'border-radius': '5px',
+      height: '20px',
+      width: '100%'
+    }"
+  >
+  </ngx-skeleton-loader> -->
+  <div *ngIf="isLoading">
+    <div
+      class="skeleton w-full h-10 rounded-md bg-gray-200 animate-pulse"
+    ></div>
+  </div>
+  <div class="text-red-500 font-bold" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="repositories.length > 0">
+    <div class="flex flex-col items-center justify-center m-2">
+      <div>Image</div>
+      <div>
+        <div class="text-2xl text-black font-medium">{{ details.name }}</div>
+        <div class="text-base">{{ details.bio }}</div>
+        <div class="text-base">{{ details.location }}</div>
+        <div class="text-base">
+          Twitter: https://twitter.com/{{ details.twitter_username }}
+        </div>
+      </div>
+    </div>
+    <div>https://github.com/{{ username }}</div>
+    <div class="grid grid-cols-2 gap-4">
+      <div
+        *ngFor="let repo of repositories"
+        class="border-black border-2 text-left p-2 h-50"
+      >
+        <h3 class="text-xl text-blue-400 font-medium">{{ repo.name }}</h3>
+        <p *ngIf="repo.description" class="text-base">{{ repo.description }}</p>
+      </div>
+    </div>
+
+    <div class="flex justify-between mt-4">
+      <div class="text-gray-500">
+        Showing {{ perPage }} repositories per page
+      </div>
+      <div class="flex items-center">
+        <select
+          [(ngModel)]="perPage"
+          class="rounded-md border border-gray-300 px-2 py-1 mr-2"
+        >
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <button
+          (click)="onPageChange(currentPage - 1)"
+          class="rounded-md border border-gray-300 px-2 py-1 mr-2 disabled:opacity-50"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+        <span>Page {{ currentPage }}</span>
+        <button
+          (click)="onPageChange(currentPage + 1)"
+          class="rounded-md border border-gray-300 px-2 py-1 ml-2"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="text-gray-500 text-center mt-8"
+    *ngIf="repositories.length === 0 && !isLoading"
+  >
+    No repositories found for this user.
   </div>
 </div>

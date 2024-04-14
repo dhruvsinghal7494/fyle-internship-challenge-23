@@ -1,19 +1,46 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { tap, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
 
-  constructor(
-    private httpClient: HttpClient
-  ) { }
+  private readonly baseUrl = 'https://api.github.com';
 
-  getUser(githubUsername: string) {
-    return this.httpClient.get(`https://api.github.com/users/${githubUsername}`);
+  constructor(private httpClient: HttpClient) { }
+
+  getUserDetails(username: string): Observable<any> {
+    return this.httpClient.get(`${this.baseUrl}/users/${username}`).pipe(
+      map(response => response as any),
+      catchError(this.handleError)
+    );
   }
 
-  // implement getRepos method by referring to the documentation. Add proper types for the return type and params 
+  getRepos(username: string, page: number = 1, perPage: number = 10): Observable<any[]> {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('per_page', String(perPage));
+
+    return this.httpClient.get(`${this.baseUrl}/users/${username}/repos`, { params })
+      .pipe(
+        map(response => response as any[]), // Type cast response to array of repositories
+        catchError(this.handleError)
+      );
+  }
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'Unknown error occurred';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    console.error(errorMessage);
+    return throwError(errorMessage);
+  }
 }
