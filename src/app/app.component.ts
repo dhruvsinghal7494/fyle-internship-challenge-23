@@ -97,6 +97,7 @@ export class AppComponent implements OnInit {
         this.isLoading = false;
         this.details = user;
         this.repositories = repos;
+        console.log('Fetched user details:', this.details);
       },
       error: error => {
         this.isLoading = false;
