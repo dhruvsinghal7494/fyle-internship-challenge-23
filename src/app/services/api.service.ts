@@ -8,7 +8,6 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ApiService {
-//  accessToken = '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'; 
   private readonly baseUrl = 'https://api.github.com';
 
 
