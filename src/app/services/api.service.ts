@@ -15,9 +15,9 @@ export class ApiService {
 
   getUserData(username: string): Observable<any> {
     const url = `${this.baseUrl}/users/${username}`;
-    const headers = new HttpHeaders({ 'Authorization': `token ${environment.githubAccessToken}` }); 
+    // const headers = new HttpHeaders({ 'Authorization': `token ${environment.githubAccessToken}` }); 
 
-    return this.httpClient.get(url, { headers })
+    return this.httpClient.get(url, { })
       .pipe(
         map(response => response as any),
         catchError(this.handleError)
