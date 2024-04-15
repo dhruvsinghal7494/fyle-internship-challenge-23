@@ -83,7 +83,7 @@
           <i class="fa-solid fa-location-dot"></i>{{ details.location }}
         </div>
         <div class="text-sm mt-2">
-          Twitter: https://twitter.com/{{ details.twitter_username }}
+          Twitter : https://twitter.com/{{ details.twitter_username }}
         </div>
       </div>
       <div></div>
@@ -98,6 +98,15 @@
       >
         <h3 class="text-xl text-blue-400 font-medium">{{ repo.name }}</h3>
         <p *ngIf="repo.description" class="text-sm">{{ repo.description }}</p>
+        <div *ngIf="repo.languages" class="mt-2 rounded-lg p-2 flex flex-row">
+          <div *ngFor="let language of repo.languages | keyvalue">
+            <div
+              class="p-1 mb-1 bg-blue-600 text-white text-sm font-medium mr-2"
+            >
+              {{ language.key }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

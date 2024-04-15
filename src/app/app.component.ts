@@ -1,44 +1,14 @@
-// import { Component, OnInit } from '@angular/core';
-// import { ApiService } from './services/api.service';
 
-// @Component({
-//   selector: 'app-root',
-//   templateUrl: './app.component.html',
-//   styleUrls: ['./app.component.scss']
-// })
-// export class AppComponent implements OnInit{
-//   title = 'fyle-frontend-challenge';
-//   GetRepos: any;
-//   constructor(
-//     private apiService: ApiService
-//   ) {}
-
-//   ngOnInit() {
-//     this.apiService.getUser('johnpapa').subscribe(console.log);
-//   }
-//   private loadRepos() {
-//     this.apiService.getRepos('johnpapa').subscribe({
-//       next: (data:any) => {
-//         this.GetRepos = data;
-//         console.log('Fetched repositories:', this.GetRepos);
-//     },
-//     error: (error:any) => {
-//       console.log(error);
-//     }
-//     });
-    
-//   }
-// }
 
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from './services/api.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, timeout } from 'rxjs';
 
 interface Repository {
   name: string;
-  description?: string; 
-  
-  // ... other properties
+  description?: string;
+  languages_url?: string;
+  languages?: { [language: string]: number }; 
 }
 
 interface User {
@@ -56,8 +26,8 @@ interface User {
 })
 export class AppComponent implements OnInit {
   title = 'fyle-frontend-challenge';
-  username: string='';
-  details: User= {} as User;
+  username: string = '';
+  details: User = {} as User;
   repositories: Repository[] = [];
   isLoading = false;
   currentPage = 1;
@@ -69,35 +39,32 @@ export class AppComponent implements OnInit {
   ngOnInit() {
   }
 
-  // searchUser() {
-  //   this.isLoading = true;
-  //   this.errorMessage = undefined; // Clear any previous error messages
-  //   this.repositories = []; // Clear previous repositories
-
-  //   this.apiService.getUserDetails(this.username)
-  //     .subscribe({
-  //       next: () => this.loadRepos(this.currentPage), // Load repositories after successful user fetch
-  //       error: error => {
-  //         this.isLoading = false;
-  //         this.errorMessage = `Error fetching user: ${error.message}`;
-  //       }
-  //     });
-  // }
- 
   searchUser() {
     this.isLoading = true;
-    this.errorMessage = undefined; // Clear any previous error messages
-    this.repositories = []; // Clear previous repositories
+    this.errorMessage = undefined; 
+    this.repositories = []; 
 
     forkJoin([
-      this.apiService.getUserDetails(this.username),
+      // setTimeout(() => this.apiService.getUserData(this.username), 2000), // Add timeout to simulate delay
+      this.apiService.getUserData(this.username),
       this.apiService.getRepos(this.username, this.currentPage, this.perPage)
     ]).subscribe({
       next: ([user, repos]) => {
         this.isLoading = false;
         this.details = user;
-        this.repositories = repos;
         console.log('Fetched user details:', this.details);
+        forkJoin(repos.map(repo => this.apiService.getRepoLanguages(this.username, repo.name)))
+          .subscribe({
+            next: languages => {
+              this.repositories = repos.map((repo, index) => ({
+                ...repo,
+                languages: languages[index]
+              }));
+            },
+            error: error => {
+              console.error('Error fetching languages:', error);
+            }
+          });
       },
       error: error => {
         this.isLoading = false;
@@ -105,7 +72,6 @@ export class AppComponent implements OnInit {
       }
     });
   }
- 
   loadRepos(page: number) {
     this.isLoading = true;
 
@@ -122,7 +88,7 @@ export class AppComponent implements OnInit {
       });
   }
 
-   onPageChange(pageNumber: number) {
+  onPageChange(pageNumber: number) {
     this.currentPage = pageNumber;
     this.loadRepos(pageNumber);
   }
