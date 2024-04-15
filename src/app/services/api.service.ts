@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ApiService {
- accessToken = environment.githubAccessToken; 
+ 
   private readonly baseUrl = 'https://api.github.com';
 
 
@@ -16,7 +16,7 @@ export class ApiService {
 
   getUserData(username: string): Observable<any> {
     const url = `${this.baseUrl}/users/${username}`;
-    const headers = new HttpHeaders({ 'Authorization': `token ${this.accessToken}` }); 
+    const headers = new HttpHeaders({ 'Authorization': `token ${environment.githubAccessToken}` }); 
 
     return this.httpClient.get(url, { headers })
       .pipe(
